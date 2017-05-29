@@ -22,6 +22,9 @@ needrestart () {
 		then  
 			RSERVICE=$(/usr/bin/needs-restarting -s)
 			RKERNEL=$(/usr/bin/needs-restarting -r | egrep -v 'More|http' )
+    else 
+            echo -e  "$MAGENTA yum install need-restarting ? $NO_COLOR"
+
 	fi
 
 }
