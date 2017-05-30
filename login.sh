@@ -15,13 +15,27 @@ MEM2=$(free -t -m  | grep "Mem" | awk '{print $2" MB";}')
 RACINE=$(df -Ph | grep vg_sys-slash  | awk '{print $4}' | tr -d '\n')
 USR=$(df -Ph | grep vg_sys-usr | awk '{print $4}' | tr -d '\n')
 
+grep Linux /etc/redhat-release > /dev/null
+if [ $? -eq 0  ]
+    then 
+        REDHAT=$(cat /etc/redhat-release  | awk '{print $4}' | awk -F  "." '{print $1}')
+else
+
+        REDHAT=$(cat /etc/redhat-release  | awk '{print $3}' | awk -F  "." '{print $1}')
+fi
 
 needrestart () {
 
 	if [ -f /usr/bin/needs-restarting ]
 		then  
-			RSERVICE=$(/usr/bin/needs-restarting -s)
-			RKERNEL=$(/usr/bin/needs-restarting -r | egrep -v 'More|http' )
+            if [ "$REDHAT" -eq 7  ] || [ "$REDHAT" -gt 7  ] 
+                then 
+			        RSERVICE=$(/usr/bin/needs-restarting -s)
+			        RKERNEL=$(/usr/bin/needs-restarting -r | egrep -v 'More|http' )
+            else 
+			        RSERVICE=$(/usr/bin/needs-restarting)
+			        RKERNEL=$(/usr/bin/needs-restarting)
+            fi
     else 
             echo -e  "$MAGENTA yum install need-restarting ? $NO_COLOR"
 
