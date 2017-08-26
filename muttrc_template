@@ -1,0 +1,24 @@
+set realname = "Name"
+set from = "s@example.fr"
+set use_from = yes
+set envelope_from = yes
+set imap_user = "user@domain.com"
+set smtp_pass = "xxxxMDP"
+set smtp_url = "smtp://user@smtp.domain.com:587/"
+set imap_pass = "xxxxMDP"
+set folder = "imap://imap.domain.com:143"
+#set spoolfile = "+INBOX"
+#set ssl_force_tls = yes
+set ssl_starttls=yes
+# G to get mail
+# bind index G imap-fetch-mail
+ set editor = "vim"
+ set charset = "utf-8"
+# set record = ''
+#
+## On s'identifie dès le lancement de Mutt
+set spoolfile="imap://user@imap.domain.com:143/INBOX"
+## On fixe la boite de réception
+
+#set imap_authenticators="gssapi:cram-md5:login:plain"
+set imap_authenticators="login"
