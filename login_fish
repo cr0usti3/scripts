@@ -1,0 +1,5 @@
+if [ $SHLVL -eq 1 -a $USER = "seb" ]
+    .  /home/seb/.config/fish/functions/ssh-agent.fish
+        startx
+end
+
