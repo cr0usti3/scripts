@@ -15,35 +15,40 @@ MEM2=$(free -t -m  | grep "Mem" | awk '{print $2" MB";}')
 RACINE=$(df -Ph | grep vg_sys-slash  | awk '{print $4}' | tr -d '\n')
 USR=$(df -Ph | grep vg_sys-usr | awk '{print $4}' | tr -d '\n')
 
-grep Linux /etc/redhat-release > /dev/null
-if [ $? -eq 0  ]
+if [ -f /etc/redhat-release ];then
+
+grep -q Linux /etc/redhat-release 2> /dev/null
+  if [ $? -eq 0  ]
     then 
         REDHAT=$(cat /etc/redhat-release  | awk '{print $4}' | awk -F  "." '{print $1}')
-else
+  else
 
         REDHAT=$(cat /etc/redhat-release  | awk '{print $3}' | awk -F  "." '{print $1}')
+  fi
 fi
 
 needrestart () {
 
 	if [ -f /usr/bin/needs-restarting ]
-		then  
+    then
             if [ "$REDHAT" -eq 7  ] || [ "$REDHAT" -gt 7  ] 
                 then 
-			        RSERVICE=$(/usr/bin/needs-restarting -s)
-			        RKERNEL=$(/usr/bin/needs-restarting -r | egrep -v 'More|http' )
+			        RSERVICE=$(/usr/bin/needs-restarting -s 2> /dev/null)
+			        RKERNEL=$(/usr/bin/needs-restarting -r  |egrep -v 'More|http' 2> /dev/null )
             else 
-			        RSERVICE=$(/usr/bin/needs-restarting)
-			        RKERNEL=$(/usr/bin/needs-restarting)
+			        RSERVICE=$(/usr/bin/needs-restarting 2> /dev/null)
+			        RKERNEL=$(/usr/bin/needs-restarting 2> /dev/null)
             fi
+    elif [ -f /usr/sbin/needrestart ]
+        then
+            RSERVICE=$(/usr/sbin/needrestart -r l -b  2> /dev/null)
+           echo $RSERVICE  | grep -q "NEEDRESTART-KEXP"   && RKERNEL=$( echo $RSERVICE |grep "NEEDRESTART-KEXP" )
     else 
             echo -e  "$MAGENTA yum install need-restarting ? $NO_COLOR"
 
 	fi
 
 }
-
-
 
 echo -e " $GREEN
 	=================== $BLANC$HOSTNAME$GREEN ===============================
@@ -55,13 +60,13 @@ $BLANC      - CPU usage ............. $MAGENTA $LOAD1,$LOAD5,$LOAD15 $BLANC
 needrestart
 if [ !  -z "$RSERVICE" ]    
 	then 
-	echo -e  " $BLANC      - DES SERVICES NEED TO RESTART ..............  $MAGENTA $RSERVICE $NO_COLOR"
+	echo -e  " $BLANC      - DES SERVICES NEED TO RESTART ..............  $MAGENTA \n$RSERVICE $NO_COLOR"
 else 
 	echo -e " $MAGENTA 0 services need RESTART "
 fi
 if [  ! -z "$RKERNEL" ]
 	then 
-	echo -e "$BLANC       - KERNEl NEED REBOOT........... $MAGENTA $RKERNEL "
+	echo -e "$BLANC       - KERNEl NEED REBOOT........... \n$MAGENTA $RKERNEL "
 	 echo -e "       $GREEN ============================== $NO_COLOR"
 
 else 
